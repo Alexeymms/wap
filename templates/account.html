@@ -1,0 +1,61 @@
+<!--
+ wap: A minimalistic wireless billing system
+
+ Copyright(C) 2013 Global Reach Communications, Inc.
+ All Rights Reserved.
+
+ You have obtained a development version of this software in its source format.
+ You may not modify, redistribute or re-use this software under any circumstances,
+ including (but not limited to): selling, sublicensing, transferring owership,
+ creating derivative works, copying or reinstalling.  For more information, please
+ contact licensing@globalreachcomm.com
+-->
+
+<html>
+<head>
+<title>so! wireless</title>
+</head>
+
+<body>
+  <div id=account_ledger>
+    <table>
+      <thead>
+	<tr>
+	  <th class="top-left">Time</th>
+	  <th>Transaction Type</th>
+	  <th>Ammount</th>
+	  <th>Reason</th>
+	  <th>Agent</th>
+	</tr>
+      </thead>
+      <tbody>
+	{% for entry in ledger.entries %}
+	<tr>
+	  <td>{{ entry['ts'] }}</td>
+	  <td>{{ entry['type'] }}</td>
+	  <td>{{ entry['amount'] }}</td>
+	  <td>{{ entry['reason'] }}</td>
+	  <td>{{ entry['agent'].username }}</td>
+	</tr>
+	{% endfor %}
+	<tr>
+	  <td></td>
+	  <td><b>Balance</b></td>
+	  <td>{{ balance }}</td>
+	  <td></td>
+	  <td></td>
+	</tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div id=account_information>
+    <form id="form-id" method="POST" action="http://192.168.0.224:9997/login">
+      Welcome to so! wireless.  Please <a href="#" onclick="document.getElementById('form-id').submit();">click here to connect to the Internet</a>.  Alternatively you may <a href={{ url_for('login') }}>log into your account</a> to apply this scratch-card as a voucher credit.  If you do not have an account, please <a href="{{ url_for('register') }}">click here to register.</a>
+      <input type="hidden", name="username" value="{{ username }}">
+      <input type="hidden", name="password" value="{{ password }}">
+    </form>
+  </div>
+</body>
+
+</html>

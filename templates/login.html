@@ -1,0 +1,38 @@
+<!--
+ wap: A minimalistic wireless billing system
+
+ Copyright(C) 2013 Global Reach Communications, Inc.
+ All Rights Reserved.
+
+ You have obtained a development version of this software in its source format.
+ You may not modify, redistribute or re-use this software under any circumstances,
+ including (but not limited to): selling, sublicensing, transferring owership,
+ creating derivative works, copying or reinstalling.  For more information, please
+ contact licensing@globalreachcomm.com
+-->
+
+<html>
+<head>
+<title>so! wireless</title>
+</head>
+
+<body>
+  <div id=login>
+    <h2>Login with your so! Username and Password</h2>
+    <form method=POST action="{{ url_for('login') }}">
+      Username: <input type="text" name="username">
+      Password: <input type="password" name="password">
+      <input type="submit" value="Login">
+    </form>
+  </div>
+
+  <div id=scratch>
+    <h2>Or enter your scratch-card number to connect anonymously</h2>
+    <form method=POST action="{{ url_for('cardauth') }}">
+      Scratch-Card: <input type="text" name="username">
+      <input type="submit" value="Login">
+    </form>
+  </div>
+</body>
+
+</html>
