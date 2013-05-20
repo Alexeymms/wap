@@ -17,11 +17,14 @@ import hashlib
 from users import *
 from card import *
 from DB import *
+from config import *
+
 from account import account
 
 app = Flask(__name__)
 app.register_blueprint(account)
 app.jinja_env.autoescape = False
+Config = Config()
 
 @app.route('/register')
 def register():

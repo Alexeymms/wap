@@ -1,0 +1,16 @@
+
+#
+# This controls the MySQL Database access.  Self-explanatory
+#
+[database]
+host = mysql.somisp.com
+user = myuser
+pass = mypass
+db = wapdb
+
+#
+# The ZoneDirector login and logout URLs.  See the ZD documentation for details
+#
+[zonedirector]
+login = http://192.168.1.224:9997/login
+logout = http://192.168.1.224:9996/logout

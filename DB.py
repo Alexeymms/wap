@@ -10,18 +10,22 @@
 # contact licensing@globalreachcomm.com
 
 import MySQLdb
+from config import *
 
 class DB:
     """ This is mbasically a mysql_ping() hack, because MySQLdb unhelpfully lacks basic keepalive support """
 
     conn = None
 
+    def __init__(self):
+        self.Config = Config()
+
     def connect(self):
         #global conn
-        self.conn = MySQLdb.connect(host = '192.168.0.228',
-                                    user = 'dcorbe',
-                                    passwd = 'cgpe845Z',
-                                    db = 'somcloud')
+        self.conn = MySQLdb.connect(host = self.Config.database['host'],
+                                    user = self.Config.database['user'],
+                                    passwd = self.Config.database['pass'],
+                                    db = self.Config.database['db'])
         #conn = self.conn
         self.conn.autocommit(True)
 

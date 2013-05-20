@@ -17,6 +17,9 @@ from DB import *
 from card import *
 from users import *
 from ledger import *
+from config import *
+
+Config = Config()
 
 account = Blueprint('account', __name__)
 
@@ -35,4 +38,5 @@ def account_main():
                                username=card.card,
                                password=card.card,
                                ledger=ledger,
-                               balance=balance)
+                               balance=balance,
+                               zdconfig=Config.zonedirector)

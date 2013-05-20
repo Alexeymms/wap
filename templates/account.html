@@ -50,7 +50,7 @@
   </div>
 
   <div id=account_information>
-    <form id="form-id" method="POST" action="http://192.168.0.224:9997/login">
+    <form id="form-id" method="POST" action="{{ zdconfig['login'] }}">
       Welcome to so! wireless.  Please <a href="#" onclick="document.getElementById('form-id').submit();">click here to connect to the Internet</a>.  Alternatively you may <a href={{ url_for('login') }}>log into your account</a> to apply this scratch-card as a voucher credit.  If you do not have an account, please <a href="{{ url_for('register') }}">click here to register.</a>
       <input type="hidden", name="username" value="{{ username }}">
       <input type="hidden", name="password" value="{{ password }}">
