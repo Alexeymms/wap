@@ -55,7 +55,8 @@ def authorize(p):
             ledger = Ledger()
             ledger.bycard(card.id)
         except:
-            return(radiusd.RLM_MODULE_FAIL)
+            print "Username and Password aren't the same..  Returning fail."
+            return radiusd.RLM_MODULE_FAIL
 
         if card.id > 0:
             pass
@@ -72,7 +73,8 @@ def authorize(p):
             ledger = Ledger()
             ledger.byuser(user.id)
         except:
-            return(radiusd.RLM_MODULE_FAIL)
+            print "Something went wrong pulling the username or the ledger.  Failing"
+            return radiusd.RLM_MODULE_FAIL
             
         if user.passcomp(Password) == True:
             pass
@@ -126,6 +128,7 @@ def accounting(p):
         Type = 'card'
         p.card(c.id)
     else:
+        print "Can't get card or user ID.  Returning fail."
         return radiusd.RLM_MODULE_FAIL
 
     #
@@ -146,6 +149,7 @@ def accounting(p):
         elif Type == 'user':
             db.execute("INSERT INTO ledger (i_user, type, amount, reason, session) VALUES (%s, %s, %s, %s, %s)", (u.id, 'Debit', 0.00, 'Session Login: {0}'.format(AVPairs['Acct-Multi-Session-Id']), AVPairs['Acct-Multi-Session-Id'])) 
         else:
+            print "Can't figure out if the AP is talking about a card or a user.  Returning FAIL"
             return radiusd.RLM_MODULE_FAIL
 
     elif AVPairs['Acct-Status-Type'] == 'Stop':
@@ -157,6 +161,7 @@ def accounting(p):
                     Amount, AVPairs['Acct-Multi-Session-Id']))
 
     else:
+        print "Not a Start, Stop or Interm-Update record.  Returning FAIL"
         return radiusd.RLM_MODULE_FAIL
 
     # 

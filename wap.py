@@ -26,9 +26,12 @@ app.register_blueprint(account)
 app.jinja_env.autoescape = False
 Config = Config()
 
-@app.route('/register')
+@app.route('/register', methods=['GET', 'POST'])
 def register():
-    return "REGISTER"
+    if request.method == "POST":
+        
+    else:
+        return render_template('register.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
