@@ -85,10 +85,10 @@ def authorize(p):
     Balance = ledger.get_balance()
     if Balance >= 0.01:
         return(radiusd.RLM_MODULE_UPDATED, 
-               (('Class', 'Internet')
+               (('Class', 'Internet'),
                 ('Framed-Route', 's1d1'),
-                ('Framed-Pool', '41.79.196.1')),
-               (('Auth-Type', 'python')))
+                ('Framed-Pool', '41.79.196.1'),),
+               (('Auth-Type', 'python'),))
     else:
             return(radiusd.RLM_MODULE_REJECT)
 
