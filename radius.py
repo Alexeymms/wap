@@ -86,7 +86,9 @@ def authorize(p):
     if Balance >= 0.01:
         return(radiusd.RLM_MODULE_UPDATED,
                (('Class', 'Internet'),),
-               (('Auth-Type', 'python'),))
+               (('Auth-Type', 'python'),),
+               (('Framed-Route', 's1d1'),),
+               (('Framed-Pool', '41.79.196.1'),))
     else:
             return(radiusd.RLM_MODULE_REJECT)
 
