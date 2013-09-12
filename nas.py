@@ -11,83 +11,83 @@
 
 from DB import *
 
-class Card():
-    queryCardSelect = """
-        SELECT id,card,balance
-        FROM cards
-	WHERE card = %s"""
+class Nas():
+    queryNasSelect = """
+        SELECT id,identifier,description
+        FROM nas
+	WHERE identifier = %s"""
 
-    queryCidSelect = """
-	SELECT id,card,balance
-	FROM cards
+    queryNidSelect = """
+        SELECT id,identifier,description
+	FROM nas
 	WHERE id = %s"""
 
-    def __init__(self, i_card=0):
+    def __init__(self, i_nas=0):
         self.id = 0
-        self.card = None
-        self.balance = 0.00
+        self.identifier = None
+        self.description = None
         self.options = None
-        self.open(i_card)
+        self.open(i_nas)
 
-    def open(self, i_card=0):
+    def open(self, i_nas=0):
         try:
             db = conn.cursor()
         except NameError:
             conn = DB()
             db = conn.cursor()
 
-        if i_card == 0:
+        if i_nas == 0:
             self.id = 0
-            self.card = None
-            self.balance = 0.00
+            self.identifier = None
+            self.description = None
             self.options = None;
             return
 
-        db.execute(self.queryCidSelect, (i_card))
+        db.execute(self.queryNidSelect, (i_nas))
         row = db.fetchone()
         
         try:
             self.id = row[0]
-            self.card = row[1]
-            self.balance = row[2]
+            self.identifier = row[1]
+            self.description = row[2]
         except:
             self.id = 0
-            self.card = None
-            self.balance = 0.00
+            self.identifier = None
+            self.description = None
             self.options = None;
 
-        self.options = Card_Options(self.id)
+        self.options = Nas_Options(self.id)
 
-    def get_card(self, card):
+    def get_nas(self, identifier):
         try:
             db = conn.cursor()
         except NameError:
             conn = DB()
             db = conn.cursor()
 
-        db.execute(self.queryCardSelect, (card))
+        db.execute(self.queryNasSelect, (identifier))
         row = db.fetchone()
 
         try:
             self.id = row[0]
-            self.card = row[1]
-            self.balance = row[2]
+            self.identifier = row[1]
+            self.description = row[2]
         except:
             self.id = 0
-            self.card = None
-            self.balance = 0.00
-            self.options = None;
+            self.identifier = None
+            self.description = None
+            self.options = None
 
-        self.options = Card_Options(self.id)
+        self.options = Nas_Options(self.id)
 
 
-class Card_Options():
+class Nas_Options():
     queryOptionsSelect = """
         SELECT *
-        FROM card_options
+        FROM nas_options
         WHERE id = %s"""
 
-    def __init__(self, i_card):
+    def __init__(self, i_nas):
         self.avpairs = dict()
 
         try:
@@ -96,11 +96,12 @@ class Card_Options():
             conn = DB()
             db = conn.cursor()
 
-        if i_card == 0:
+        if i_nas == 0:
             self.avpairs = None
             return
         
-        db.execute(self.queryOptionsSelect, (i_card))
+        db.execute(self.queryOptionsSelect, (i_nas))
 
         for row in db.fetchall():
             self.avpairs[row[1]] = row[2]
+

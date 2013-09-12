@@ -23,6 +23,7 @@
 import radiusd
 import re
 
+from nas import *
 from users import *
 from card import *
 from ledger import *
@@ -35,6 +36,19 @@ def instantiate(p):
     conn = DB()
 
 def authorize(p):
+    #
+    # We need to initialize some variables to avoid throwing exceptions later
+    #
+    Username = None
+    Password = None
+    NasIdentifier = None
+    NasIPAddress = None
+    ServiceType = None
+    attribs = (('Class', 'Internet'),)
+
+    #
+    # Loop through the NAS-supplied attributes to figure some things out
+    #
     for (Key, Value) in p:
         Value = re.sub(r'^"|"$', '', Value)
         print "{0} = {1}".format(Key, Value)
@@ -44,6 +58,15 @@ def authorize(p):
 
         if Key == "User-Password":
             Password = Value
+
+        if Key == "Service-Type":
+            ServiceType = Value
+
+        if Key == "NAS-Identifier":
+            NasIdentifier = Value
+            
+        if Key == "NAS-IP-Address":
+            NasIPAddress = None;
 
     #
     # Someone's trying to log in with a card
@@ -58,7 +81,9 @@ def authorize(p):
             return(radiusd.RLM_MODULE_FAIL)
 
         if card.id > 0:
-            pass
+            # Add card-specific attributes to the Access-Accept packet.
+            for key in card.options.avpairs:
+                attribs = attribs + ((key, card.options.avpairs[key]),)
         else:
             return(radiusd.RLM_MODULE_REJECT)
 
@@ -75,22 +100,35 @@ def authorize(p):
             return(radiusd.RLM_MODULE_FAIL)
             
         if user.passcomp(Password) == True:
-            pass
+            # Add user-specific attributes to the Access-Accept packet.
+            for key in user.options.avpairs:
+                attribs = attribs + ((key, user.options.avpairs[key]),)
         else:
             return(radiusd.RLM_MODULE_REJECT)
 
     #
-    # Finally, check the balance
+    # Add NAS-specific attributes to the Access-Accept packet.
     #
-    Balance = ledger.get_balance()
-    if Balance >= 0.01:
-        return(radiusd.RLM_MODULE_UPDATED, 
-               (('Class', 'Internet'),
-                ('Framed-Route', 's1d1'),
-                ('Framed-Pool', '41.79.196.1'),),
-               (('Auth-Type', 'python'),))
-    else:
+    nas = Nas()
+    if NasIdentifier:
+        nas.get_nas(NasIdentifier)
+        for key in nas.options.avpairs:
+            attribs = attribs + ((key, nas.options.avpairs[key]),)
+
+
+    #
+    # If the NAS isn't specifically requesting Service-Type=Authenticate-Only,
+    # then we need to check the balance before we send off an Access-Accept
+    #
+    if ServiceType != "Authenticate-Only":
+        Balance = ledger.get_balance()
+        if Balance >= 0.01:
+            pass
+        else:
             return(radiusd.RLM_MODULE_REJECT)
+
+    return(radiusd.RLM_MODULE_UPDATED, attribs, (('Auth-Type', 'python'),))
+    
 
 def preacct(p):
     return radiusd.RLM_MODULE_OK

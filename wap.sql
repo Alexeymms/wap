@@ -16,7 +16,7 @@ CREATE TABLE `cards` (
   `i_product` bigint(20) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `card` (`card`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1
+) ENGINE=InnoDB;
 
 CREATE TABLE `ledger` (
   `i_user` bigint(20) unsigned NOT NULL DEFAULT '0',
@@ -28,7 +28,7 @@ CREATE TABLE `ledger` (
   `session` varchar(64) DEFAULT NULL,
   `ts` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   KEY `session` (`session`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1
+) ENGINE=InnoDB;
 
 CREATE TABLE `products` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -39,7 +39,7 @@ CREATE TABLE `products` (
   `fee` decimal(10,6) NOT NULL DEFAULT '0.000000',
   `day` int(11) DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1
+) ENGINE=InnoDB;
 
 CREATE TABLE `users` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -51,4 +51,33 @@ CREATE TABLE `users` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`),
   KEY `email` (`email`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1
+) ENGINE=InnoDB;
+
+CREATE TABLE `nas` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `identifier` char(30) NOT NULL,
+  `description` text,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `identifier` (`identifier`)
+) ENGINE=InnoDB;
+
+CREATE TABLE `nas_options` (
+  `id` bigint(20) unsigned NOT NULL,
+  `attribute` char(30) NOT NULL,
+  `value` char(128) NOT NULL,
+  PRIMARY KEY (`id`,`attribute`)
+) ENGINE=InnoDB;
+
+CREATE TABLE `user_options` (
+  `id` bigint(20) unsigned NOT NULL,
+  `attribute` char(30) NOT NULL,
+  `value` char(128) NOT NULL,
+  PRIMARY KEY (`id`,`attribute`)
+) ENGINE=InnoDB;
+
+CREATE TABLE `card_options` (
+  `id` bigint(20) unsigned NOT NULL,
+  `attribute` char(30) NOT NULL,
+  `value` char(128) NOT NULL,
+  PRIMARY KEY (`id`,`attribute`)
+) ENGINE=InnoDB;

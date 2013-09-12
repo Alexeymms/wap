@@ -45,6 +45,7 @@ class User():
             self.id = 0
             self.username = None
             self.password = None
+            self.options = None
             return
 
         db.execute(self.queryUserSelect, (i_user))
@@ -58,6 +59,9 @@ class User():
             self.id=0
             self.username = None
             self.password = None
+            self.options = None
+
+        self.options = User_Options(self.id)
 
     def get_user(self, username):
         try:
@@ -77,6 +81,9 @@ class User():
             self.id = 0
             self.username = None
             self.password = None
+            self.options = None
+
+        self.options = User_Options(self.id)
 
     def passcomp(self, password):
         hashpass = hashlib.sha1(self.username.lower() + password)
@@ -87,3 +94,27 @@ class User():
             return True
         
         return False
+
+class User_Options():
+    queryOptionsSelect = """
+        SELECT *
+        FROM user_options
+        WHERE id = %s"""
+
+    def __init__(self, i_user):
+        self.avpairs = dict()
+
+        try:
+            db = conn.cursor()
+        except NameError:
+            conn = DB()
+            db = conn.cursor()
+
+        if i_user == 0:
+            self.avpairs = None
+            return
+        
+        db.execute(self.queryOptionsSelect, (i_user))
+
+        for row in db.fetchall():
+            self.avpairs[row[1]] = row[2]
