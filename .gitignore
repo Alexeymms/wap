@@ -1,3 +1,4 @@
 *.csv
 *.pyc
 *.conf
+radiusd_test.py
