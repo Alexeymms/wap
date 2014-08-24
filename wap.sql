@@ -1,7 +1,5 @@
 -- wap: A minimalistic wireless billing system
 
--- A hash table implementation based on the MurmurHash 2.0 hash function
-
 -- Copyright (c) 2013, 2014 Daniel Corbe
 -- All rights reserved.
 
