@@ -37,7 +37,7 @@
 import hashlib
 from DB import *
 
-class User():
+class User(object):
     queryUserSelect = """
         SELECT id,username,password
         FROM users
@@ -120,7 +120,7 @@ class User():
         
         return False
 
-class User_Options():
+class User_Options(object):
     queryOptionsSelect = """
         SELECT *
         FROM user_options
