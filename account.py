@@ -52,18 +52,34 @@ account = Blueprint('account', __name__)
 
 @account.route('/account')
 def account_main():
+    #
+    # TODO: We *need* to authenticate the session again before rendering 
+    #       the template, otherwise the client can simply pass us login
+    #       information that we'll blindly trust.
+    #
     if 'card' in session.keys():
         card = Card()
         card.get_card(session['card'])
         
         ledger = Ledger()
         ledger.bycard(card.id)
-        
+
         balance = ledger.get_balance()
 
-        return render_template("account.html",
-                               username=card.card,
-                               password=card.card,
-                               ledger=ledger,
-                               balance=balance,
-                               zdconfig=Config.zonedirector)
+        username = card.card
+        password = card.card
+
+    else:
+        card = Card()
+        ledger = Ledger()
+        balance = 0
+
+        username = session['username']
+        password = session['password']
+
+    return render_template("account.html",
+                           username=username,
+                           password=password,
+                           ledger=ledger,
+                           balance=balance,
+                           zdconfig=Config.zonedirector)

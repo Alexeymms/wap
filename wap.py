@@ -40,6 +40,7 @@ from werkzeug.contrib.fixers import ProxyFix
 import hashlib
 
 from users import *
+from users_ldap import *
 from card import *
 from DB import *
 from config import *
@@ -61,15 +62,20 @@ def register():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == "POST":
-        user = User()
+        if Config.ldap['enabled']:
+            user = Ldap()
+        else:
+            user = User()
+
         user.get_user(request.form['username'])
 
-        if user.id == 0:
+        if user.username == None:
             return "User not in database."
         
         if user.passcomp(request.form['password']) == True:
             session['username'] = request.form['username']
             session['i_user'] = user.id
+            session['password'] = request.form['password']
             return redirect(url_for('account.account_main'))
         else:
             return "Login Incorrect"

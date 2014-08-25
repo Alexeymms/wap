@@ -43,6 +43,7 @@ class Config():
         self.configfile = configfile
         self.database = dict()
         self.zonedirector = dict()
+        self.ldap = dict()
 
         if self.config.has_section('database'):
             try:
@@ -63,3 +64,31 @@ class Config():
             except:
                 self.zonedirector['login'] = None
                 self.zonedirector['logout'] = None
+
+        if self.config.has_section('ldap'):
+            try:
+                self.ldap['enabled'] = self.config.get('ldap', 'enabled')
+                self.ldap['basedn'] = self.config.get('ldap', 'basedn')
+                self.ldap['binddn'] = self.config.get('ldap', 'binddn')
+                self.ldap['bindpw'] = self.config.get('ldap', 'bindpw')
+                self.ldap['server'] = self.config.get('ldap', 'server')
+                self.ldap['port'] = int(self.config.get('ldap', 'port'))
+                self.ldap['bindonauth'] = self.config.get('ldap', 'bindonauth')
+                self.ldap['searchkey'] = self.config.get('ldap', 'searchkey')
+            except:
+                self.ldap = dict()
+                self.ldap['enabled'] = False
+
+            self.ldap['enabled'] = self.translateliteral(self.ldap['enabled'])
+            self.ldap['binddn'] = self.translateliteral(self.ldap['enabled'])
+            self.ldap['bindpw'] = self.translateliteral(self.ldap['enabled'])
+            self.ldap['bindonauth'] = self.translateliteral(self.ldap['bindonauth'])
+
+    def translateliteral(self, literal='None'):
+        if literal == 'False':
+            return False;
+        if literal == 'True':
+            return True;
+        if literal == 'None':
+            return None;
+

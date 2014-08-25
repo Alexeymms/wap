@@ -1,7 +1,4 @@
-<!--
 # wap: A minimalistic wireless billing system
-
-# A hash table implementation based on the MurmurHash 2.0 hash function
 
 # Copyright (c) 2013, 2014 Daniel Corbe
 # All rights reserved.
@@ -36,53 +33,54 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 # OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
--->
 
-<html>
-<head>
-<title>WDO Wireless</title>
-</head>
+import ldap
 
-<body>
-  <div id=account_ledger>
-    <table>
-      <thead>
-	<tr>
-	  <th class="top-left">Time</th>
-	  <th>Transaction Type</th>
-	  <th>Ammount</th>
-	  <th>Reason</th>
-	  <th>Agent</th>
-	</tr>
-      </thead>
-      <tbody>
-	{% for entry in ledger.entries %}
-	<tr>
-	  <td>{{ entry['ts'] }}</td>
-	  <td>{{ entry['type'] }}</td>
-	  <td>{{ entry['amount'] }}</td>
-	  <td>{{ entry['reason'] }}</td>
-	  <td>{{ entry['agent'].username }}</td>
-	</tr>
-	{% endfor %}
-	<tr>
-	  <td></td>
-	  <td><b>Balance</b></td>
-	  <td>{{ balance }}</td>
-	  <td></td>
-	  <td></td>
-	</tr>
-      </tbody>
-    </table>
-  </div>
+from config import *
+from users import *
 
-  <div id=account_information>
-    <form id="form-id" method="POST" action="{{ zdconfig['login'] }}">
-      Welcome to WDO wireless.  Please <a href="#" onclick="document.getElementById('form-id').submit();">click here to connect to the Internet</a>.  Alternatively you may <a href={{ url_for('login') }}>log into your account</a> to apply this scratch-card as a voucher credit.  If you do not have an account, please <a href="{{ url_for('register') }}">click here to register.</a>
-      <input type="hidden", name="username" value="{{ username }}">
-      <input type="hidden", name="password" value="{{ password }}">
-    </form>
-  </div>
-</body>
+#
+# There is currently a problem with this module.
+#
+# When imported by FreeRADIUS it's throwing strange error messages.
+# To fix this you *MUST* build python2 with UCS2 instead of UCS4
+#
+class Ldap(User):
+    ''' This class overrides the DB-driven User() object.  It does a few
+    things differently.  Chiefly:
+    
+    1) We never store the password.
+    2) We don't bother to authenticate the Username until the first
+       call to passcomp() '''
 
-</html>
+    def __init__(self, i_user=0):
+        User.__init__(self, 0)
+        self.config = Config()        
+        self.ldap = ldap.open(self.config.ldap['server'],
+                              port=self.config.ldap['port'])
+        self.ldap.protocol_version = ldap.VERSION3
+        self.ldap.set_option(ldap.OPT_REFERRALS, 0)
+
+    def get_user(self, username):
+        ''' We can't really return an authenticated user just yet.
+        We must first attempt a bind with passcomp.  So for now, we
+        simply take the client's word at their username'''
+
+        self.username = username
+
+    def passcomp(self, password):
+        ''' In order to authenticate the user, we simply make an
+        attempt to bind it to the LDAP server'''
+        
+        try:
+            self.ldap.simple_bind_s(self.gendn(), password)
+        except ldap.INVALID_CREDENTIALS:
+            return False
+
+        return True
+
+    def gendn(self):
+        return '{2}={0},{1}'.format(self.username, 
+                                    self.config.ldap['basedn'],
+                                    self.config.ldap['searchkey'])
+

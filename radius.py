@@ -50,12 +50,15 @@ import re
 
 from nas import *
 from users import *
+from users_ldap import *
 from card import *
 from ledger import *
 from product import *
 from DB import *
+from config import *
 
 conn = None
+Config = Config()
 
 def instantiate(p):
     conn = DB()
@@ -113,6 +116,26 @@ def authorize(p):
             return(radiusd.RLM_MODULE_REJECT)
 
     #
+    # LDAP-Enabled login
+    #
+    elif Config.ldap['enabled']:
+        #
+        # We need to set this here because the NAS won't do it
+        # and we cannot currently keep accounting information
+        # for ldap-enabled clients
+        #
+        ServiceType = "Authenticate-Only"
+
+        try:
+            user = Ldap()
+            user.get_user(Username)
+        except:
+            return(radiusd.RLM_MODULE_FAIL)    
+            
+        if not user.passcomp(Password):
+            return(radiusd.RLM_MODULE_REJECT)    
+
+    #
     # Logging in with username and password
     #
     else:
@@ -137,9 +160,11 @@ def authorize(p):
     nas = Nas()
     if NasIdentifier:
         nas.get_nas(NasIdentifier)
-        for key in nas.options.avpairs:
-            attribs = attribs + ((key, nas.options.avpairs[key]),)
-
+        try:
+            for key in nas.options.avpairs:
+                attribs = attribs + ((key, nas.options.avpairs[key]),)
+        except TypeError:
+            pass
 
     #
     # If the NAS isn't specifically requesting Service-Type=Authenticate-Only,
@@ -152,7 +177,7 @@ def authorize(p):
         else:
             return(radiusd.RLM_MODULE_REJECT)
 
-    return(radiusd.RLM_MODULE_UPDATED, attribs, (('Auth-Type', 'python'),))
+    return(radiusd.RLM_MODULE_UPDATED, attribs, (('Auth-Type', 'Accept'),))
     
 
 def preacct(p):
@@ -164,6 +189,12 @@ def accounting(p):
     except NameError:
         conn = DB()
         db = conn.cursor()
+
+    #
+    # No accounting for LDAP (yet)
+    #
+    if Config.ldap['enabled']:
+        return radiusd.RLM_MODULE_FAIL
 
     #
     # Let's figure out what the AP is trying to tell us
