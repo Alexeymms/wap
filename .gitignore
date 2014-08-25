@@ -2,3 +2,5 @@
 *.pyc
 *.conf
 radiusd_test.py
+-T
+log
