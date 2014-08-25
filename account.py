@@ -52,7 +52,7 @@ account = Blueprint('account', __name__)
 
 @account.route('/account')
 def account_main():
-    if session['card']:
+    if 'card' in session.keys():
         card = Card()
         card.get_card(session['card'])
         
